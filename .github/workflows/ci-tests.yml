@@ -20,7 +20,9 @@ jobs:
           dotnet-version: ${{ env.SDK_VERSION }}
           # Cache the NuGet global-packages folder; versions are pinned centrally
           # in Directory.Packages.props, so key on it plus every project file.
-          cache: true
+          # Windows only: restore there takes ~65s uncached, while on Linux/macOS
+          # (~15s) downloading the ~1 GiB cache costs more than it saves.
+          cache: ${{ runner.os == 'Windows' }}
           cache-dependency-path: |
             Directory.Packages.props
             Directory.Build.props
