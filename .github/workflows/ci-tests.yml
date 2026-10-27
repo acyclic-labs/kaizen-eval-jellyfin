@@ -18,6 +18,14 @@ jobs:
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: ${{ env.SDK_VERSION }}
+          # Cache the NuGet global-packages folder; versions are pinned centrally
+          # in Directory.Packages.props, so key on it plus every project file.
+          cache: true
+          cache-dependency-path: |
+            Directory.Packages.props
+            Directory.Build.props
+            nuget.config
+            **/*.csproj
 
       - name: Run DotNet CLI Tests
         run: >
