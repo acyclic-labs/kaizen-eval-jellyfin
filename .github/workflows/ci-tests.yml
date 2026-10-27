@@ -19,6 +19,13 @@ jobs:
         with:
           dotnet-version: ${{ env.SDK_VERSION }}
 
+      # NuGet packages: restore from cache, keyed on the central package versions and every project file.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
       - name: Run DotNet CLI Tests
         run: >
           dotnet test Jellyfin.sln
