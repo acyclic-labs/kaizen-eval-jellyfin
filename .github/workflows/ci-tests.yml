@@ -23,16 +23,7 @@ jobs:
         run: >
           dotnet test Jellyfin.sln
           --configuration Release
-          --collect:"XPlat Code Coverage"
-          --settings tests/coverletArgs.runsettings
           --verbosity minimal
-
-      - name: Merge code coverage results
-        uses: danielpalme/ReportGenerator-GitHub-Action@d3ebf1f760f7d8ab92cc44d9bcfee7ad73722a31 # v5.5.11
-        with:
-          reports: "**/coverage.cobertura.xml"
-          targetdir: "merged/"
-          reporttypes: "Cobertura"
 
       # TODO - which action / tool to use to publish code coverage results?
       # - name: Publish code coverage results
