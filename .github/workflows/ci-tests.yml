@@ -19,12 +19,14 @@ jobs:
         with:
           dotnet-version: ${{ env.SDK_VERSION }}
 
+      # On Windows the default NuGet cache (%USERPROFILE%\.nuget\packages) is on the
+      # slow C: drive, which makes restore ~5x slower than on Linux/macOS.
+      - name: Put NuGet package cache on the temp disk
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: echo "NUGET_PACKAGES=$env:RUNNER_TEMP\nuget-packages" >> $env:GITHUB_ENV
+
       - name: Run DotNet CLI Tests
-        env:
-          # Keep the NuGet package cache on the runner's temp disk. On Windows the
-          # default (%USERPROFILE%\.nuget\packages) is on the slow C: drive, which
-          # makes restore ~6x slower than on Linux/macOS.
-          NUGET_PACKAGES: ${{ runner.temp }}/nuget-packages
         run: >
           dotnet test Jellyfin.sln
           --configuration Release
