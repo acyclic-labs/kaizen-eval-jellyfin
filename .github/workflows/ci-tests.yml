@@ -15,11 +15,23 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Windows runner disks are slow for restore/build I/O; run on a ReFS Dev Drive instead
+      - name: Setup Dev Drive
+        if: runner.os == 'Windows'
+        uses: samypr100/setup-dev-drive@562171fe8df7401fdf582d766cd3b6ab80d5b1a0 # v4.1.0
+        with:
+          drive-size: 12GB
+          trusted-dev-drive: true
+          workspace-copy: true
+          env-mapping: |
+            NUGET_PACKAGES,{{ DEV_DRIVE }}/.nuget/packages
+
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: ${{ env.SDK_VERSION }}
 
       - name: Run DotNet CLI Tests
+        working-directory: ${{ env.DEV_DRIVE_WORKSPACE || github.workspace }}
         run: >
           dotnet test Jellyfin.sln
           --configuration Release
@@ -30,7 +42,7 @@ jobs:
       - name: Merge code coverage results
         uses: danielpalme/ReportGenerator-GitHub-Action@d3ebf1f760f7d8ab92cc44d9bcfee7ad73722a31 # v5.5.11
         with:
-          reports: "**/coverage.cobertura.xml"
+          reports: ${{ env.DEV_DRIVE_WORKSPACE && format('{0}/**/coverage.cobertura.xml', env.DEV_DRIVE_WORKSPACE) || '**/coverage.cobertura.xml' }}
           targetdir: "merged/"
           reporttypes: "Cobertura"
 
