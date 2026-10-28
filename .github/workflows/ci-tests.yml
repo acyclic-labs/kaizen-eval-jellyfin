@@ -37,12 +37,13 @@ jobs:
           --configuration Release
           --collect:"XPlat Code Coverage"
           --settings tests/coverletArgs.runsettings
+          --results-directory "${{ github.workspace }}/TestResults"
           --verbosity minimal
 
       - name: Merge code coverage results
         uses: danielpalme/ReportGenerator-GitHub-Action@d3ebf1f760f7d8ab92cc44d9bcfee7ad73722a31 # v5.5.11
         with:
-          reports: ${{ env.DEV_DRIVE_WORKSPACE && format('{0}/**/coverage.cobertura.xml', env.DEV_DRIVE_WORKSPACE) || '**/coverage.cobertura.xml' }}
+          reports: "**/coverage.cobertura.xml"
           targetdir: "merged/"
           reporttypes: "Cobertura"
 
